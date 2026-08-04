@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Usuario {
+  id       Int      @id @default(autoincrement())
+  nome     String   
+  email    String   @unique
+  senha    String
+  criadoEm DateTime @default(now())
+
+  vendas   Venda[]
+
+  @@map("usuarios")
+}
+
+model Produto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  preco       Float
+  qtd_estoque Int      @default(0)
+  criadoEm    DateTime @default(now())
+
+  vendas      Venda[]
+
+  @@map("produtos")
+}
+
+model Venda {
+  id          Int      @id @default(autoincrement())
+  produto_id  Int
+  usuario_id  Int
+  qtd_vendida Int
+  valor_total Float 
+  data_venda  DateTime @default(now())
+
+  usuario     Usuario  @relation(fields: [usuario_id], references: [id])
+  produto     Produto  @relation(fields: [produto_id], references: [id])
+
+  @@map("vendas")
+}
