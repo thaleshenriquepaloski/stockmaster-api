@@ -88,9 +88,21 @@ Documentação dos Endpoints
 | **GET** | `/usuarios` | Lista todos os usuários | Nenhum | `200 OK` |
 | **DELETE** | `/usuarios/:id` | Rota para deletar usuários durante o desenvolvimento da API | Nenhum | `200 Ok` |
 
+## Produtos (`/produtos`)
+
+| Método | Endpoint | Descrição | Corpo da Requisição (JSON) | Status de Sucesso |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/produtos` | Lista todos os produtos | Nenhum | `200 OK` |
+| **GET** | `/produtos/:id` | Busca um produto específico pelo ID | Nenhum | `200 OK` |
+| **POST** | `/produtos` | Cadastra um novo produto | `{ "nome": "...", "descricao": "...", "preco": 10.5, "qtd_estoque": 10 }` | `201 Created` |
+| **PUT** | `/produtos/:id` | Atualiza dados de um produto | `{ "nome": "...", "descricao": "...", "preco": 12.0, "qtd_estoque": 15 }` | `200 OK` |
+| **DELETE** | `/produtos/:id` | Remove um produto pelo ID | Nenhum | `200 OK` |
+
 
 # Próximos Passos e & Funcionalidades Futuras
 
 - [x] Autenticação e Autorização (JWT)
-- [ ] CRUD em Produtos e Vendas
+- [x] CRUD em Produtos
+- [ ] CRUD em Vendas
 - [ ] Movimentações de Estoque (Entradas e Saídas)
+- [ ] Middleware Global de Tratamento de Erros (Ainda não obrigatório no projeto)
