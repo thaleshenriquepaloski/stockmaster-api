@@ -98,11 +98,20 @@ Documentação dos Endpoints
 | **PUT** | `/produtos/:id` | Atualiza dados de um produto | `{ "nome": "...", "descricao": "...", "preco": 12.0, "qtd_estoque": 15 }` | `200 OK` |
 | **DELETE** | `/produtos/:id` | Remove um produto pelo ID | Nenhum | `200 OK` |
 
+## Vendas (`/vendas`)
 
-# Próximos Passos e & Funcionalidades Futuras
+| Método | Endpoint | Descrição | Corpo da Requisição (JSON) | Status de Sucesso |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/vendas` | Lista todas as vendas | Nenhum | `200 OK` |
+| **GET** | `/vendas/:id` | Busca uma venda específica pelo ID | Nenhum | `200 OK` |
+| **POST** | `/produtos` | Realiza uma nova venda | `{ "produto_id": "...", "usuario_id": "...", "qtd_vendida": "..." }` | `201 Created` |
+
+# Próximos Passos & Funcionalidades Futuras
 
 - [x] Autenticação e Autorização (JWT)
 - [x] CRUD em Produtos
-- [ ] CRUD em Vendas
-- [ ] Movimentações de Estoque (Entradas e Saídas)
+- [x] CRUD em Vendas
+- [x] Movimentações de Estoque (Entradas e Saídas)
 - [ ] Middleware Global de Tratamento de Erros (Ainda não obrigatório no projeto)
+- [ ] Códigos HTTP ajustados para cada tipo de erro
+- [ ] Midleware de autenticação para rotas específicas.
