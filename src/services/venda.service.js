@@ -6,25 +6,33 @@ class VendaService {
         const { produto_id, usuario_id, qtd_vendida } = dto;
 
         if(qtd_vendida <= 0) {
-            throw new Error("Deve ser inserido no mínimo uma unidade para venda")
+            const error = new Error("Deve ser inserido no mínimo uma unidade para venda");
+            error.statusCode = 400;
+            throw error;
         };
 
         const produtoExistente = await prisma.produto.findUnique({
             where: { id: produto_id }
         })
         if(!produtoExistente) {
-            throw new Error("Produto não encontrado.");
+            const error = new Error("Produto não encontrado.");
+            error.statusCode = 404;
+            throw error;
         };
 
         const usuarioExistente = await prisma.usuario.findUnique({
             where: { id: usuario_id }
         })
         if(!usuarioExistente) {
-            throw new Error("Usuário não encontrado.")
+            const error = new Error("Usuário não encontrado.")
+            error.statusCode = 404;
+            throw error;
         }
 
         if(produtoExistente.qtd_estoque < qtd_vendida) {
-            throw new Error(`Estoque insuficiente. Unidades disponíveis: ${produtoExistente.qtd_estoque}`)
+            const error = new Error(`Estoque insuficiente. Unidades disponíveis: ${produtoExistente.qtd_estoque}`)
+            error.statusCode = 400;
+            throw error;
         };
 
         const valor_total = Number(produtoExistente.preco * qtd_vendida);
@@ -61,7 +69,9 @@ class VendaService {
             where: { id }
         })
         if(!venda) {
-            throw new Error("Venda não encontrada.")
+            const error = new Error("Venda não encontrada.")
+            error.statusCode = 404;
+            throw error;
         }
 
         return venda;

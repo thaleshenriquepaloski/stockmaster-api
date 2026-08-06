@@ -5,14 +5,18 @@ class ProdutoService {
     async cadastrar(dto) {
         const { nome, preco } = dto
         if(!nome || !preco) {
-            throw new Error("Nome e preço são obrigatórios no cadastro de um produto.");
+            const error = new Error("Nome e preço são obrigatórios no cadastro de um produto.");
+            error.statusCode = 400;
+            throw error;
         }
 
         const produtoExistente = await prisma.produto.findFirst({
             where: { nome }
         })
         if(produtoExistente) {
-            throw new Error(`Este nome de produto já está cadastrado. Você pode atualizar usando "/produtos/${produtoExistente.id}"`);
+            const error = new Error(`Este nome de produto já está cadastrado. Você pode atualizar usando "/produtos/${produtoExistente.id}"`);
+            error.statusCode = 400;
+            throw error;
         }
 
         return await prisma.produto.create({
@@ -29,9 +33,10 @@ class ProdutoService {
             where: { id }
         })
         if(!produto) {
-            throw new Error("Produto não foi encontrado. Verifique o ID e tente novamente.")
+            const error = new Error("Produto não foi encontrado. Verifique o ID e tente novamente.")
+            error.statusCode = 404;
+            throw error;
         }
-
         return produto;
     };
 
@@ -41,7 +46,9 @@ class ProdutoService {
             where: { id }
         })
         if(!produtoExistente) {
-            throw new Error("O produto que você deseja atualizar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            const error = new Error("O produto que você deseja atualizar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            error.statusCode = 404
+            throw error;
         }
 
         return await prisma.produto.update({
@@ -55,7 +62,9 @@ class ProdutoService {
             where: { id }
         })
         if(!produtoExistente) {
-            throw new Error("O produto que você deseja deletar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            const error = new Error("O produto que você deseja deletar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            error.statusCode = 404;
+            throw error;
         }
 
         await prisma.produto.delete({

@@ -5,7 +5,7 @@ class VendaController {
         this.vendaService = new VendaService();
     }
 
-    async cadastrar(req, res) {
+    async cadastrar(req, res, next) {
         try {
             const { produto_id, usuario_id, qtd_vendida } = req.body;
             const dto = { 
@@ -17,29 +17,26 @@ class VendaController {
             const vendaRealizada = await this.vendaService.cadastrar(dto);
             return res.status(201).json(vendaRealizada);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: error.message });
+            next(error);
         }
     };
  
-    async listar(req, res) {
+    async listar(req, res, next) {
         try {
             const vendas = await this.vendaService.listar();
             return res.status(200).json(vendas);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ mensagem: error.message });
+            next(error);
         }
     };
 
-    async listarPorId(req, res) {
+    async listarPorId(req, res, next) {
         try {
             const id = Number(req.params.id);
             const venda = await this.vendaService.listarPorId(id);
             return res.status(200).json(venda);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ mensagem: error.message });
+            next(error);
         }
     };
 };

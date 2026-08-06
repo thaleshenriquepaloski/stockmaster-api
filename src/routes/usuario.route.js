@@ -4,9 +4,9 @@ import UsuarioController from "../controllers/usuario.controller.js";
 const usuarioRouter = Router();
 const usuarioController = new UsuarioController();
 
-usuarioRouter.post('/auth/cadastro', (req, res) => usuarioController.cadastrar(req, res));
-usuarioRouter.post('/auth/login', (req, res) => usuarioController.login(req, res));
-usuarioRouter.get('/usuarios', (req, res) => usuarioController.listar(req, res));
-usuarioRouter.delete('/usuarios/:id', (req, res) => usuarioController.deletar(req, res));
+usuarioRouter.post('/auth/cadastro', usuarioController.cadastrar);
+usuarioRouter.post('/auth/login', usuarioController.login);
+usuarioRouter.get('/usuarios', usuarioController.listar);
+usuarioRouter.delete('/usuarios/:id', usuarioController.deletar);
 
 export default usuarioRouter;

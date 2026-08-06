@@ -5,40 +5,37 @@ class ProdutoController {
         this.produtoService = new ProdutoService();
     }
 
-    async cadastrar(req, res) {
+    async cadastrar(req, res, next) {
         try {
             const { nome, descricao, preco, qtd_estoque } = req.body;
             const dto = { nome, descricao, preco, qtd_estoque } 
             const produto = await this.produtoService.cadastrar(dto);
             return res.status(201).json(produto);
         } catch (error) {
-            console.error(error);
-            return res.status(400).json({ erro: error.message });
+            next(error);
         }
     };
 
-    async listar(req, res) {
+    async listar(req, res, next) {
         try {
             const produtos = await this.produtoService.listar();
             return res.status(200).json(produtos);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ erro: error.message });
+            next(error);
         }
     };
 
-    async listarPorId(req, res) {
+    async listarPorId(req, res, next) {
         try {
             const id = Number(req.params.id);
             const produto = await this.produtoService.listarPorId(id);
             return res.status(200).json(produto);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ erro: error.message });
+            next(error);
         }
     };
 
-    async atualizar(req, res) {
+    async atualizar(req, res,next) {
         try {
             const id = Number(req.params.id);
             const { nome, descricao, preco, qtd_estoque } = req.body;
@@ -46,19 +43,17 @@ class ProdutoController {
             const produtoAtualizado = await this.produtoService.atualizar(id, dto);
             return res.status(200).json(produtoAtualizado);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ erro: error.message });
+            next(error);
         }
     };
 
-    async deletar(req, res) {
+    async deletar(req, res, next) {
         try {
             const id = Number(req.params.id);
             const retornoDeDelecao = await this.produtoService.deletar(id);
             return res.status(200).json(retornoDeDelecao);
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ erro: error.message });            
+            next(error);   
         }
     };
 };

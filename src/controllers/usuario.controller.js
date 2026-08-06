@@ -5,45 +5,42 @@ class UsuarioController {
         this.usuarioService = new UsuarioService();
     }
 
-    async cadastrar(req, res) {
+    cadastrar = async (req, res, next) => {
         try {
             const { nome, email, senha } = req.body;
             const usuario = await this.usuarioService.cadastrar(nome, email, senha);
             return res.status(201).json(usuario);
         } catch (error) {
-            console.error(error)
-            return res.status(400).json({ erro: error.message });
+            next(error);
         }
     };
 
-    async login(req, res) {
+    login = async (req, res, next) => {
         try {
             const { email, senha } = req.body;
             const resultado = await this.usuarioService.login(email, senha);
             return res.status(200).json(resultado);
         } catch (error) {
-            console.error(error);
-            return res.status(401).json({ erro: error.message });
+            next(error);
         }
     };
 
-    async listar(req, res) {
+    listar = async (req, res, next) => {
         try {
             const usuarios = await this.usuarioService.listar();
             return res.status(200).json(usuarios);
         } catch (error) {
-            return res.status(500).json({ erro: error.message });
+            next(error);
         }
     };
     
-    async deletar(req, res) {
+    deletar = async (req, res, next) => {
         try {
             const { id } = req.params;
             const resultado = await this.usuarioService.deletar(id);
             return res.status(200).json(resultado); 
         } catch (error) {
-            console.error(error);
-            return res.status(404).json({ erro: error.message });
+            next(error);
         }
     };
 };
