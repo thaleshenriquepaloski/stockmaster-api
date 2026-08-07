@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
 
     // 3. O formato esperado é "Bearer <TOKEN>"
     const parts = authHeader.split(" ");
-    if(parts.length !== 2 || parts[0] === "Bearer") {
+    if(parts.length !== 2 || parts[0] !== "Bearer") {
         const error = new Error("Formato do Token inválido!");
         error.statusCode = 401;
         return next(error);
