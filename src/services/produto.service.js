@@ -3,7 +3,7 @@ import prisma from "../database/prisma.js";
 class ProdutoService {
     
     async cadastrar(dto) {
-        const { nome, preco } = dto
+        const { nome, preco, qtd_estoque } = dto
         if(!nome || !preco) {
             const error = new Error("Nome e preço são obrigatórios no cadastro de um produto.");
             error.statusCode = 400;
@@ -15,6 +15,18 @@ class ProdutoService {
         })
         if(produtoExistente) {
             const error = new Error(`Este nome de produto já está cadastrado. Você pode atualizar usando "/produtos/${produtoExistente.id}"`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if(typeof preco !== 'number' || isNaN(preco) || preco <= 0) {
+            const error = new Error("Insira um preço válido e adequado ao produto!")
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if(typeof qtd_estoque !== 'number' || isNaN(qtd_estoque) || qtd_estoque <= 0) {
+            const error = new Error("Quantidade de estoque deve ser um valor válido!");
             error.statusCode = 400;
             throw error;
         }
@@ -49,6 +61,14 @@ class ProdutoService {
             const error = new Error("O produto que você deseja atualizar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
             error.statusCode = 404
             throw error;
+        }
+        
+        if(dto.preco !== undefined) {
+            if(typeof dto.preco !== 'number' || isNaN(dto.preco) || dto.preco <= 0) {
+                const error = new Error("O preço precisa ser um número válido!");
+                error.statusCode = 400;
+                throw error;
+            }
         }
 
         return await prisma.produto.update({
