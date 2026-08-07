@@ -5,8 +5,8 @@ import authMiddleware from "../middlewares/auth.middleware.js";
 const vendaRouter = Router();
 const vendaController = new VendaController();
 
-vendaRouter.get('/vendas', authMiddleware, (req, res) => vendaController.listar(req, res));
-vendaRouter.get('/vendas/:id', authMiddleware, (req, res) => vendaController.listarPorId(req, res));
-vendaRouter.post('/vendas', authMiddleware, (req, res) => vendaController.cadastrar(req, res));
+vendaRouter.get('/vendas', authMiddleware, vendaController.listar);
+vendaRouter.get('/vendas/:id', authMiddleware, vendaController.listarPorId);
+vendaRouter.post('/vendas', authMiddleware, vendaController.cadastrar);
 
 export default vendaRouter;

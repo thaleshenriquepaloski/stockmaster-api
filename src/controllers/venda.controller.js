@@ -5,12 +5,12 @@ class VendaController {
         this.vendaService = new VendaService();
     }
 
-    async cadastrar(req, res, next) {
+    cadastrar = async (req, res, next) => {
         try {
-            const { produto_id, usuario_id, qtd_vendida } = req.body;
+            const { produto_id, qtd_vendida } = req.body;
             const dto = { 
                 produto_id: Number(produto_id),
-                usuario_id: Number(usuario_id), 
+                usuario_id: req.usuarioLogado?.id ? Number(req.usuarioLogado.id) : undefined, 
                 qtd_vendida: Number(qtd_vendida)
             };
 
@@ -21,7 +21,7 @@ class VendaController {
         }
     };
  
-    async listar(req, res, next) {
+    listar = async (req, res, next) => {
         try {
             const vendas = await this.vendaService.listar();
             return res.status(200).json(vendas);
@@ -30,7 +30,7 @@ class VendaController {
         }
     };
 
-    async listarPorId(req, res, next) {
+    listarPorId = async (req, res, next) => {
         try {
             const id = Number(req.params.id);
             const venda = await this.vendaService.listarPorId(id);

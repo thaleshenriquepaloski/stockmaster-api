@@ -11,6 +11,18 @@ class VendaService {
             throw error;
         };
 
+        if(typeof produto_id !== 'number' || isNaN(produto_id) || produto_id === undefined) {
+            const error = new Error("Insira o ID do produto corretamente!");
+            error.statusCode = 400;
+            throw error;
+        }
+        
+        if(!qtd_vendida || isNaN(qtd_vendida) || qtd_vendida <= 0) {
+            const error = new Error("Deve ser inserido no mínimo uma unidade válida para venda!")
+            error.statusCode = 400;
+            throw error;
+        }
+
         const produtoExistente = await prisma.produto.findUnique({
             where: { id: produto_id }
         })
@@ -52,7 +64,9 @@ class VendaService {
             prisma.produto.update({
                 where: { id: produto_id },
                 data: {
-                    qtd_estoque: produtoExistente.qtd_estoque - qtd_vendida
+                    qtd_estoque: {
+                        decrement: qtd_vendida
+                    }
                 }
             })
         ]);
@@ -65,6 +79,12 @@ class VendaService {
     };
 
     async listarPorId(id) {
+        if(typeof id !== 'number' || isNaN(id) || id === undefined) {
+            const error = new Error("Tipo de ID da venda não reconhecido!");
+            error.statusCode = 400;
+            throw error;
+        }
+        
         const venda = await prisma.venda.findUnique({
             where: { id }
         })
