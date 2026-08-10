@@ -14,6 +14,7 @@ O **StockMaster API** é um sistema de controle e gestão de estoque projetado c
 - **Framework Web:** Express.js
 - **ORM:** Prisma 7
 - **Banco de Dados:** SQLite (`better-sqlite3`)
+- **Validação de Schemas:** Zod
 - **Segurança:** Bcrypt (Hash de senhas) e JSON Web Token (JWT)
 - **Gerenciador de Dependências:** npm
 
@@ -28,10 +29,12 @@ stockmaster-api/
 ├── prisma/               # Schemas e migrações do banco de dados
 ├── src/
 │   ├── controllers/      # Camada de entrada (trata requisições e respostas HTTP)
+|   ├── generated/        # Camada do ORM Prisma
 │   ├── database/         # Instância e configuração de conexão do Prisma Client
 |   ├── middlewares/      # Middlewares de autenticação (JWT) e validações
 │   ├── routes/           # Definição das rotas e endpoints do Express
 │   ├── services/         # Camada de regras de negócio e acesso a dados
+|   ├── validators/       # Schemas de validação do Zod
 │   └── app.js            # Configuração das middlewares e rotas do Express
 ├── .env                  # Variáveis de ambiente
 ├── dev.db                # Banco de dados SQLite local
@@ -118,7 +121,7 @@ npm run dev
 - [x] Middleware Global de Tratamento de Erros
 - [x] Códigos HTTP ajustados para cada tipo de erro
 - [x] Middleware de autenticação para rotas específicas.
+- [x] Validação de esquemas de entrada com Zod.
 - [ ] Conteinerização do ambiente com Docker e PostgreSQL
-- [ ] Validação de esquemas de entrada com Zod.
 - [ ] Testes Unitários e de Integração com Vitest / Supertest
 - [ ] Documentação interativa das rotas com Swagger UI.
