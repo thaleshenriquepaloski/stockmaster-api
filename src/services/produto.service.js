@@ -3,16 +3,32 @@ import prisma from "../database/prisma.js";
 class ProdutoService {
     
     async cadastrar(dto) {
-        const { nome, preco } = dto
+        const { nome, preco, qtd_estoque } = dto
         if(!nome || !preco) {
-            throw new Error("Nome e preço são obrigatórios no cadastro de um produto.");
+            const error = new Error("Nome e preço são obrigatórios no cadastro de um produto.");
+            error.statusCode = 400;
+            throw error;
         }
 
         const produtoExistente = await prisma.produto.findFirst({
             where: { nome }
         })
         if(produtoExistente) {
-            throw new Error(`Este nome de produto já está cadastrado. Você pode atualizar usando "/produtos/${produtoExistente.id}"`);
+            const error = new Error(`Este nome de produto já está cadastrado. Você pode atualizar usando "/produtos/${produtoExistente.id}"`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if(typeof preco !== 'number' || isNaN(preco) || preco <= 0) {
+            const error = new Error("Insira um preço válido e adequado ao produto!")
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if(typeof qtd_estoque !== 'number' || isNaN(qtd_estoque) || qtd_estoque <= 0) {
+            const error = new Error("Quantidade de estoque deve ser um valor válido!");
+            error.statusCode = 400;
+            throw error;
         }
 
         return await prisma.produto.create({
@@ -29,9 +45,10 @@ class ProdutoService {
             where: { id }
         })
         if(!produto) {
-            throw new Error("Produto não foi encontrado. Verifique o ID e tente novamente.")
+            const error = new Error("Produto não foi encontrado. Verifique o ID e tente novamente.")
+            error.statusCode = 404;
+            throw error;
         }
-
         return produto;
     };
 
@@ -41,7 +58,17 @@ class ProdutoService {
             where: { id }
         })
         if(!produtoExistente) {
-            throw new Error("O produto que você deseja atualizar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            const error = new Error("O produto que você deseja atualizar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            error.statusCode = 404
+            throw error;
+        }
+        
+        if(dto.preco !== undefined) {
+            if(typeof dto.preco !== 'number' || isNaN(dto.preco) || dto.preco <= 0) {
+                const error = new Error("O preço precisa ser um número válido!");
+                error.statusCode = 400;
+                throw error;
+            }
         }
 
         return await prisma.produto.update({
@@ -55,7 +82,9 @@ class ProdutoService {
             where: { id }
         })
         if(!produtoExistente) {
-            throw new Error("O produto que você deseja deletar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            const error = new Error("O produto que você deseja deletar não foi encontrado em nosso banco de dados. Verifique o ID e tente novamente.")
+            error.statusCode = 404;
+            throw error;
         }
 
         await prisma.produto.delete({

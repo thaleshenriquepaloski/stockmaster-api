@@ -6,25 +6,45 @@ class VendaService {
         const { produto_id, usuario_id, qtd_vendida } = dto;
 
         if(qtd_vendida <= 0) {
-            throw new Error("Deve ser inserido no mínimo uma unidade para venda")
+            const error = new Error("Deve ser inserido no mínimo uma unidade para venda");
+            error.statusCode = 400;
+            throw error;
         };
+
+        if(typeof produto_id !== 'number' || isNaN(produto_id) || produto_id === undefined) {
+            const error = new Error("Insira o ID do produto corretamente!");
+            error.statusCode = 400;
+            throw error;
+        }
+        
+        if(!qtd_vendida || isNaN(qtd_vendida) || qtd_vendida <= 0) {
+            const error = new Error("Deve ser inserido no mínimo uma unidade válida para venda!")
+            error.statusCode = 400;
+            throw error;
+        }
 
         const produtoExistente = await prisma.produto.findUnique({
             where: { id: produto_id }
         })
         if(!produtoExistente) {
-            throw new Error("Produto não encontrado.");
+            const error = new Error("Produto não encontrado.");
+            error.statusCode = 404;
+            throw error;
         };
 
         const usuarioExistente = await prisma.usuario.findUnique({
             where: { id: usuario_id }
         })
         if(!usuarioExistente) {
-            throw new Error("Usuário não encontrado.")
+            const error = new Error("Usuário não encontrado.")
+            error.statusCode = 404;
+            throw error;
         }
 
         if(produtoExistente.qtd_estoque < qtd_vendida) {
-            throw new Error(`Estoque insuficiente. Unidades disponíveis: ${produtoExistente.qtd_estoque}`)
+            const error = new Error(`Estoque insuficiente. Unidades disponíveis: ${produtoExistente.qtd_estoque}`)
+            error.statusCode = 400;
+            throw error;
         };
 
         const valor_total = Number(produtoExistente.preco * qtd_vendida);
@@ -44,7 +64,9 @@ class VendaService {
             prisma.produto.update({
                 where: { id: produto_id },
                 data: {
-                    qtd_estoque: produtoExistente.qtd_estoque - qtd_vendida
+                    qtd_estoque: {
+                        decrement: qtd_vendida
+                    }
                 }
             })
         ]);
@@ -57,11 +79,19 @@ class VendaService {
     };
 
     async listarPorId(id) {
+        if(typeof id !== 'number' || isNaN(id) || id === undefined) {
+            const error = new Error("Tipo de ID da venda não reconhecido!");
+            error.statusCode = 400;
+            throw error;
+        }
+        
         const venda = await prisma.venda.findUnique({
             where: { id }
         })
         if(!venda) {
-            throw new Error("Venda não encontrada.")
+            const error = new Error("Venda não encontrada.")
+            error.statusCode = 404;
+            throw error;
         }
 
         return venda;

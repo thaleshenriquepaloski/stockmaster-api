@@ -6,13 +6,17 @@ class UsuarioService {
 
     async cadastrar(nome, email, senhaDescrip) {
         if(!nome || !email || !senhaDescrip) {
-            throw new Error('Nome, e-mail e senha são obrigatórios.');
+            const error = new Error('Nome, e-mail e senha são obrigatórios.');
+            error.statusCode = 400
+            throw error;
         }
         const usuarioExiste = await prisma.usuario.findUnique({
             where: { email }
         });
         if(usuarioExiste) {
-            throw new Error('Este e-mail já está em uso!');
+            const error = new Error('Este e-mail já está em uso!');
+            error.statusCode = 409; 
+            throw error;
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -27,19 +31,25 @@ class UsuarioService {
 
     async login(email, senha) {
         if(!email || !senha) {
-            throw new Error ("E-mail e senha são obrigatórios!");
+            const error = new Error("E-mail e senha são obrigatórios!");
+            error.statusCode = 400
+            throw error;
         }
 
         const usuario = await prisma.usuario.findUnique({
             where: { email }
         });
         if(!usuario) {
-            throw new Error("E-mail ou senha inválidos!");
+            const error = new Error("E-mail ou senha inválidos!");
+            error.statusCode = 401;
+            throw error;
         }
 
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
         if(!senhaValida) {
-            throw new Error("E-mail ou senha inválidos!");
+            const error = new Error("E-mail ou senha inválidos!");
+            error.statusCode = 404;
+            throw error;
         }
 
         const secret = process.env.JWT_SECRET || "default_secret";
@@ -73,7 +83,9 @@ class UsuarioService {
         });
 
         if(!usuarioExiste) {
-            throw new Error("Usuário não encontrado!");
+            const error = new Error("Usuário não encontrado!");
+            error.statusCode = 404;
+            throw error;
         }
 
         await prisma.usuario.delete({
