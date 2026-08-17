@@ -14,7 +14,7 @@ class ProdutoService {
             where: { nome }
         })
         if(produtoExistente) {
-            const error = new Error(`Este nome de produto já está cadastrado. Você pode atualizar usando "/produtos/${produtoExistente.id}"`);
+            const error = new Error(`Este nome de produto já está cadastrado.`);
             error.statusCode = 400;
             throw error;
         }
