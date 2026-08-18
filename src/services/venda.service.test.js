@@ -70,6 +70,74 @@ describe('VendaService - Testes unitários', () => {
             await expect(vendaService.cadastrar(dto)).rejects.toThrow(/^Usuário não encontrado.$/);
             expect(prisma.usuario.findUnique).toHaveBeenCalledWith({ where: { id: 99 }});
         });
+
+        it('deve lançar um erro 400 caso o estoque seja insuficiente', async () => {
+            prisma.produto.findUnique.mockResolvedValue({ id: 1, nome: 'Estoque', preco: 23, qtd_estoque: 10, criadoEm: new Date() });
+            prisma.usuario.findUnique.mockResolvedValue({ id: 1, nome: 'User Teste', email: 'teste@teste.com' });
+            const dto = { produto_id: 1, usuario_id: 1, qtd_vendida: 11 };
+
+            await expect(vendaService.cadastrar(dto)).rejects.toThrow(/^Estoque insuficiente. Unidades disponíveis: 10$/);
+            expect(prisma.$transaction).not.toHaveBeenCalled();
+        });
+
+        it('deve calcular venda_total corretamente e salvar uma venda', async () => {
+            const precoUnitario = 150.35;
+            const qtdVendida = 3;
+            const valorTotalEsperado = 451.05;
+
+            const dto = { produto_id: 1, usuario_id: 1, qtd_vendida: qtdVendida };
+
+            prisma.produto.findUnique.mockResolvedValue({ id: 1, nome: 'teste', preco: precoUnitario, qtd_estoque: 3 });
+            prisma.usuario.findUnique.mockResolvedValue({ id: 1, nome: 'teste user', email: 'teste@teste.com' });
+
+            const vendaMock = { id: 1, ...dto, valor_total: valorTotalEsperado };
+            prisma.$transaction.mockResolvedValue([vendaMock]);
+
+            const resultado = await vendaService.cadastrar(dto);
+
+            expect(resultado).toEqual(vendaMock);
+            expect(resultado.valor_total).toBe(valorTotalEsperado);
+            expect(prisma.$transaction).toHaveBeenCalled();
+        });
+    });
+
+    describe('listar()', () => {
+        it('deve listar as vendas realizadas', async () => {
+            const vendasMock = [
+                { id: 1, produto_id: 1, usuario_id: 1, qtd_vendida: 2, valor_total: 50, data_venda: new Date() },
+                { id: 2, produto_id: 2, usuario_id: 2, qtd_vendida: 3, valor_total: 75, data_venda: new Date() },
+            ];
+            prisma.venda.findMany.mockResolvedValue(vendasMock);
+
+            const resultado = await vendaService.listar();
+
+            expect(resultado).toEqual(vendasMock);
+            expect(prisma.venda.findMany).toHaveBeenCalled();
+        });
+    });
+
+    describe('listarPorId()', () => {
+        it('deve lançar um erro 400 caso o tipo de ID não seja um número válido', async () => {
+            await expect(vendaService.listarPorId('1')).rejects.toThrow(/^Tipo de ID da venda não reconhecido!$/);
+            expect(prisma.venda.findUnique).not.toHaveBeenCalled();
+        });
+
+        it('deve lançar um erro 404 caso o ID da venda não seja encontrado', async () => {
+            prisma.venda.findUnique.mockResolvedValue(null);
+
+            await expect(vendaService.listarPorId(2)).rejects.toThrow(/^Venda não encontrada.$/);
+            expect(prisma.venda.findUnique).toHaveBeenCalledWith({ where: { id: 2 }});
+        });
+
+        it('deve listar uma venda pelo ID fornecido', async () => {
+            const vendaMock = { id: 1, produto_id: 1, usuario_id: 1, qtd_vendida: 2, valor_total: 50 }
+            prisma.venda.findUnique.mockResolvedValue(vendaMock);
+
+            const resultado = await vendaService.listarPorId(1)
+
+            expect(resultado).toEqual(vendaMock);
+            expect(prisma.venda.findUnique).toHaveBeenCalledWith({ where: { id: 1 }});
+        });
     });
 });
 
