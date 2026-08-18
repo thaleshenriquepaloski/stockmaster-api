@@ -1,6 +1,6 @@
 # StockMaster API 📦
 
-API RESTful para gerenciamento de estoque, desenvolvida com Node.js, Express, Prisma ORM e SQLite.
+API RESTful para gerenciamento de estoque, desenvolvida com Node.js, Express, Prisma ORM e PostgreSQL.
 
 ## 📋 Sobre o Projeto
 
@@ -13,10 +13,11 @@ O **StockMaster API** é um sistema de controle e gestão de estoque projetado c
 - **Runtime:** Node.js (ES Modules)
 - **Framework Web:** Express.js
 - **ORM:** Prisma 7
-- **Banco de Dados:** SQLite (`better-sqlite3`)
+- **Banco de Dados:** PostgreSQL (via Docker)
 - **Validação de Schemas:** Zod
 - **Segurança:** Bcrypt (Hash de senhas) e JSON Web Token (JWT)
 - **Gerenciador de Dependências:** npm
+- **Testes unitários:** Vitest
 
 ---
 
@@ -33,11 +34,10 @@ stockmaster-api/
 │   ├── database/         # Instância e configuração de conexão do Prisma Client
 |   ├── middlewares/      # Middlewares de autenticação (JWT) e validações
 │   ├── routes/           # Definição das rotas e endpoints do Express
-│   ├── services/         # Camada de regras de negócio e acesso a dados
+│   ├── services/         # Camada de regras de negócio e acesso a dados com cobertura de testes
 |   ├── validators/       # Schemas de validação do Zod
 │   └── app.js            # Configuração das middlewares e rotas do Express
 ├── .env                  # Variáveis de ambiente
-├── dev.db                # Banco de dados SQLite local
 └── server.js             # Ponto de entrada (Entrypoint) do servidor HTTP
 ```
 
@@ -63,15 +63,23 @@ npm install
 
  - Crie ou certifique-se de ter um arquivo .env na raiz do projeto com a seguinte variável:
 ```
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/stockmaster?schema=public"
 ```
-### 4. Execute as migrações do Prisma:
+### 4. Suba o banco de dados via Docker:
 ```
-npx prisma migrate dev
+docker compose up postgres -d
 ```
-### 5. Inicie o servidor de desenvolvimento:
+### 5. Execute as migrações do Prisma:
 ```
-npm run dev
+npx prisma migrate dev --name init_postgres
+```
+### 6. Suba a aplicação completamente:
+```
+docker compose up --build
+```
+### 7. Execute os testes unitários:
+```
+npm test
 ```
 ### A aplicação estará rodando em http://localhost:3000 (ou na porta configurada).
 
@@ -122,6 +130,7 @@ npm run dev
 - [x] Códigos HTTP ajustados para cada tipo de erro
 - [x] Middleware de autenticação para rotas específicas.
 - [x] Validação de esquemas de entrada com Zod.
-- [ ] Conteinerização do ambiente com Docker e PostgreSQL
-- [ ] Testes Unitários e de Integração com Vitest / Supertest
+- [x] Testes Unitários com Vitest
+- [x] Conteinerização do ambiente com Docker e PostgreSQL
+- [ ] Testes de Integração com Supertest
 - [ ] Documentação interativa das rotas com Swagger UI.
