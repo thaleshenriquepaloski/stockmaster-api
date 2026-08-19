@@ -80,5 +80,24 @@ describe('Teste de Integração - Usuário e Auth', () => {
         });
     });
 
+    describe('GET /usuarios', () => {
+        it('deve retornar uma lista de usuarios cadastrados', async () => {
+            const senhaHash1 = await bcrypt.hash('user1User#', 10);
+            const senhaHash2 = await bcrypt.hash('user2User#', 10);
+            await prisma.usuario.createMany({
+                data: [
+                    { nome: 'user 1', email: 'user1@email.com', senha: senhaHash1 },
+                    { nome: 'user 2', email: 'user2@email.com', senha: senhaHash2 }
+                ]
+            });
+
+            const resposta = await request(app)
+                .get('/usuarios')
+
+            expect(resposta.status).toBe(200);
+            expect(resposta.body.length).toBe(2);
+        });
+    });
+
 
 })
