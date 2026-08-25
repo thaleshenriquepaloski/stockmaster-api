@@ -82,6 +82,7 @@ describe('Teste de Integração - Usuário e Auth', () => {
 
     describe('GET /usuarios', () => {
         it('deve retornar uma lista de usuarios cadastrados', async () => {
+            await prisma.usuario.deleteMany();
             const senhaHash1 = await bcrypt.hash('user1User#', 10);
             const senhaHash2 = await bcrypt.hash('user2User#', 10);
             await prisma.usuario.createMany({
