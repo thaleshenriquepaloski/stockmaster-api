@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 
 describe('Teste de Integração - Usuário e Auth', () => {
     beforeEach(async () => {
+        await prisma.venda.deleteMany();
         await prisma.usuario.deleteMany();
     });
 

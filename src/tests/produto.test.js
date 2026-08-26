@@ -8,15 +8,16 @@ import jwt from 'jsonwebtoken';
 describe('Teste de Integração - Produto', () => {
 
     beforeEach(async () => {
-        await prisma.usuario.deleteMany();
+        await prisma.venda.deleteMany();
         await prisma.produto.deleteMany();
+        await prisma.usuario.deleteMany();
     });
 
     //helper function
     const criarUsuarioTeste = async () => {
         const senhaHash = await bcrypt.hash('senhaTeste123%', 10);
         const usuario = await prisma.usuario.create({
-            data: { nome: 'User', email: 'user@teste.com' , senha: senhaHash }
+            data: { nome: 'User', email: `user${Date.now()}@teste.com` , senha: senhaHash }
         });
         const token = jwt.sign({ id: usuario.id, email: 'user@teste.com' }, process.env.JWT_SECRET || 'chave_secreta_apenas_para_testes');
         return [usuario, token];
