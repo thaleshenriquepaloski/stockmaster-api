@@ -56,4 +56,52 @@ describe('Teste de Integração - Venda', () => {
             expect(resposta.body.length).toEqual(2);
         });
     });
+
+    describe('GET /vendas/:id', () => {
+        it('deve lançar um erro 401 ao tentar listar uma venda pelo id sem o token', async () => {
+            const resposta = await request(app)
+                .get('/vendas/1');
+            
+            expect(resposta.status).toBe(401);
+            expect(resposta.body.erro).toMatch(/^Token não fornecido!$/);
+        });
+
+        it('deve lançar um erro 400 caso id de uma venda não seja reconhecido', async () => {
+            const [, token, ] = await criarUsuarioQueCriaProdutos();
+            const resposta = await request(app)
+                .get('/vendas/t')
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(resposta.status).toBe(400);
+            expect(resposta.body.erro).toMatch(/^Tipo de ID da venda não reconhecido!$/)
+        });
+
+        it('deve lançar um erro 404 caso a venda não seja encontrada pelo id fornecido', async () => {
+            const [, token, ] = await criarUsuarioQueCriaProdutos();
+            const resposta = await request(app)
+                .get('/vendas/1')
+                .set('Authorization', `Bearer ${token}`);
+            
+            expect(resposta.status).toBe(404);
+            expect(resposta.body.erro).toMatch(/^Venda não encontrada.$/)
+        });
+
+        it('deve listar a venda pelo id fornecido', async () => {
+            const [ usuario, token, produtos ] = await criarUsuarioQueCriaProdutos();
+            const venda = await prisma.venda.create({ 
+                data: { produto_id: produtos[0].id, usuario_id: usuario.id, qtd_vendida: 2, valor_total: 20 }
+            });
+
+            const resposta = await request(app)
+                .get(`/vendas/${venda.id}`)
+                .set('Authorization', `Bearer ${token}`)
+            
+            expect(resposta.status).toBe(200);
+            expect(resposta.body).toHaveProperty('id', venda.id);
+            expect(resposta.body.produto_id).toBe(produtos[0].id);
+            expect(resposta.body.usuario_id).toBe(usuario.id);
+            expect(resposta.body.qtd_vendida).toBe(2);
+            expect(resposta.body.valor_total).toBe(20);
+        });
+    });
 });
