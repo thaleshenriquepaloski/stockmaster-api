@@ -5,12 +5,6 @@ class VendaService {
     async cadastrar(dto) {
         const { produto_id, usuario_id, qtd_vendida } = dto;
 
-        if(qtd_vendida <= 0) {
-            const error = new Error("Deve ser inserido no mínimo uma unidade para venda");
-            error.statusCode = 400;
-            throw error;
-        };
-
         if(typeof produto_id !== 'number' || isNaN(produto_id) || produto_id === undefined) {
             const error = new Error("Insira o ID do produto corretamente!");
             error.statusCode = 400;

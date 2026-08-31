@@ -132,5 +132,5 @@ npm test
 - [x] Validação de esquemas de entrada com Zod.
 - [x] Testes Unitários com Vitest
 - [x] Conteinerização do ambiente com Docker e PostgreSQL
-- [ ] Testes de Integração com Supertest
+- [x] Testes de Integração com Supertest
 - [ ] Documentação interativa das rotas com Swagger UI.
