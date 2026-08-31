@@ -2,7 +2,9 @@ import { ZodError } from "zod";
 
 const errorMiddleware = (err, req, res, next) => {
     // 1. exibindo o log de erro no terminal (apenas para debug em desenvolvimento)
-    console.error("Erro capturado pelo Middleware:", err.stack || err.message);
+    if(process.env.NODE_ENV !== 'test') {
+        console.error("Erro capturado pelo Middleware:", err.stack || err.message);
+    }
 
     // 2. Tratamento específico: Erros de validação do Zod.
     if(err instanceof ZodError) {

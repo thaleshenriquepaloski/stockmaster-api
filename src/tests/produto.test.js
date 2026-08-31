@@ -4,6 +4,7 @@ import app from '../app.js';
 import prisma from '../database/prisma.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'node:crypto';
 
 describe('Teste de Integração - Produto', () => {
 
@@ -17,9 +18,9 @@ describe('Teste de Integração - Produto', () => {
     const criarUsuarioTeste = async () => {
         const senhaHash = await bcrypt.hash('senhaTeste123%', 10);
         const usuario = await prisma.usuario.create({
-            data: { nome: 'User', email: `user${Date.now()}@teste.com` , senha: senhaHash }
+            data: { nome: 'User', email: `user_${crypto.randomUUID}@teste.com` , senha: senhaHash }
         });
-        const token = jwt.sign({ id: usuario.id, email: 'user@teste.com' }, process.env.JWT_SECRET || 'chave_secreta_apenas_para_testes');
+        const token = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_SECRET || 'chave_secreta_apenas_para_testes');
         return [usuario, token];
     };
 

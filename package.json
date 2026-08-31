@@ -6,7 +6,7 @@
   "scripts": {
     "test": "vitest src/services",
     "test:unit": "vitest src/services",
-    "test:integration": "dotenv -e .env.test -- npx prisma migrate deploy && dotenv -e .env.test -- vitest src/tests",
+    "test:integration": "dotenv -e .env.test -- npx prisma migrate deploy && dotenv -e .env.test -- vitest src/tests --no-file-parallelism",
     "test:all": "vitest",
     "start": "node server.js",
     "dev": "nodemon server.js"

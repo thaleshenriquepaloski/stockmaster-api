@@ -20,7 +20,7 @@ describe('Teste de Integração - Venda', () => {
         const usuario = await prisma.usuario.create({
             data: { nome: 'User', email: `user${Date.now()}@teste.com` , senha: senhaHash }
         });
-        const token = jwt.sign({ id: usuario.id, email: 'user@teste.com' }, process.env.JWT_SECRET || 'chave_secreta_apenas_para_testes');
+        const token = jwt.sign({ id: usuario.id, email: usuario.email }, process.env.JWT_SECRET || 'chave_secreta_apenas_para_testes');
         
         const produtos = await prisma.produto.createManyAndReturn({ 
             data: [
@@ -102,6 +102,96 @@ describe('Teste de Integração - Venda', () => {
             expect(resposta.body.usuario_id).toBe(usuario.id);
             expect(resposta.body.qtd_vendida).toBe(2);
             expect(resposta.body.valor_total).toBe(20);
+        });
+    });
+
+    describe('POST /vendas', () => {
+        it('deve lançar um erro 401 ao não enviar o token de autenticação', async () => {
+            const resposta = await request(app).post('/vendas')
+            expect(resposta.status).toBe(401);
+            expect(resposta.body.erro).toMatch(/^Token não fornecido!$/);
+        });
+
+        it('deve lançar um erro de produto (id) invalido (validação ZOD)', async () => {
+            const [ usuario, token, produtos ] = await criarUsuarioQueCriaProdutos();
+            
+            const resposta = await request(app)
+                .post('/vendas')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ produto_id: -1, usuario_id: usuario.id, qtd_vendida: 10 });
+            
+            expect(resposta.status).toBe(400);
+            expect(resposta.body.erros[0].mensagem).toMatch('ID de produto inválido!')
+        });
+
+        it('deve lançar um erro 400 caso a quantidade vendida seja menor ou igual a 0', async () => {
+            const [ usuario, token, produtos ] = await criarUsuarioQueCriaProdutos();
+
+            const resposta = await request(app)
+                .post('/vendas')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ produto_id: produtos[0].id, usuario_id: usuario.id, qtd_vendida: 0 });
+            
+            expect(resposta.status).toBe(400);
+            expect(resposta.body.erros[0].mensagem).toMatch(/^Quantidade de produto precisa ser de no mínimo 1 unidade.$/);
+        });
+
+        it('deve lançar um erro 404 ao não encontrar o produto para venda (id)', async () => {
+            const [ usuario, token, ] = await criarUsuarioQueCriaProdutos();
+
+            const resposta = await request(app)
+                .post('/vendas')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ produto_id: 999, usuario_id: usuario.id, qtd_vendida: 20 });
+
+            expect(resposta.status).toBe(404);
+            expect(resposta.body.erro).toMatch(/^Produto não encontrado.$/)
+        });
+
+        it('deve lançar um erro 404 ao não encontrar o usuario vendedor (id)', async () => {
+            const [ usuario, token, produtos ] = await criarUsuarioQueCriaProdutos();
+            await prisma.usuario.delete({ where: { id: usuario.id }})
+            const resposta = await request(app)
+                .post('/vendas')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ produto_id: produtos[0].id, usuario_id: 999, qtd_vendida: 10 });
+
+            expect(resposta.status).toBe(404);
+            expect(resposta.body.erro).toMatch(/^Usuário não encontrado.$/)
+        });
+
+        it('deve lançar um erro 400 caso a quantidade disponível no estoque seja inferior a quantidade venda', async () => {
+            const [ usuario, token, produtos ] = await criarUsuarioQueCriaProdutos();
+
+            const resposta = await request(app)
+                .post('/vendas')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ produto_id: produtos[1].id, usuario_id: usuario.id, qtd_vendida: 201 });
+
+            expect(resposta.status).toBe(400);
+            expect(resposta.body.erro).toMatch(/^Estoque insuficiente. Unidades disponíveis: 200$/);
+        });
+
+        it('deve cadastrar uma nova venda e decrementar a quantidade de estoque em Produtos', async () => {
+            const [ usuario, token, produtos ] = await criarUsuarioQueCriaProdutos();
+            const produtoInicial = produtos[0];
+            const qtdVendida = 5;
+            
+            const resposta = await request(app)
+                .post('/vendas')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ produto_id: produtoInicial.id, usuario_id: usuario.id, qtd_vendida: qtdVendida });
+            
+            expect(resposta.status).toBe(201);
+            expect(resposta.body).toHaveProperty('id');
+            expect(resposta.body.produto_id).toBe(produtoInicial.id);
+            expect(resposta.body.usuario_id).toBe(usuario.id);
+            expect(resposta.body.qtd_vendida).toBe(qtdVendida);
+            expect(resposta.body.valor_total).toBe(1000);
+
+            const produtoNoBanco = await prisma.produto.findUnique({ where: { id: produtoInicial.id }});
+            
+            expect(produtoNoBanco.qtd_estoque).toBe(95);
         });
     });
 });
