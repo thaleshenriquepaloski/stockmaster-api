@@ -6,7 +6,24 @@ import { validadorCadastroUsuario, validadorLoginUsuario } from "../validators/u
 const usuarioRouter = Router();
 const usuarioController = new UsuarioController();
 
-usuarioRouter.post('/auth/cadastro', validator(validadorCadastroUsuario), usuarioController.cadastrar);
+usuarioRouter.post('/auth/cadastro', validator(validadorCadastroUsuario), (req, res, next) => {
+    /* 
+      #swagger.tags = ['Autenticação']
+      #swagger.summary = 'Cadastra um novo usuário'
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              nome: "Thales",
+              email: "thales@email.com",
+              senha: "Senha123segura$"
+          }
+      }
+      #swagger.responses[201] = { description: 'Usuário cadastrado com sucesso.' }
+      #swagger.responses[400] = { description: 'Erro de validação nos dados enviados.' }
+    */    
+    usuarioController.cadastrar(req, res, next);
+});
 usuarioRouter.post('/auth/login', validator(validadorLoginUsuario), usuarioController.login);
 usuarioRouter.get('/usuarios', usuarioController.listar);
 usuarioRouter.delete('/usuarios/:id', usuarioController.deletar);

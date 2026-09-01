@@ -16,6 +16,20 @@ class UsuarioController {
     };
 
     login = async (req, res, next) => {
+        /* 
+        #swagger.tags = ['Autenticação']
+        #swagger.summary = 'Autentica o usuário e gera o token JWT'
+        #swagger.parameters['body'] = {
+            in: 'body',
+            required: true,
+            schema: {
+            email: "thales@email.com",
+            senha: "Senha123segura$"
+            }
+        }
+        #swagger.responses[200] = { description: 'Login realizado com sucesso.' }
+        #swagger.responses[401] = { description: 'Credenciais inválidas.' }
+        */
         try {
             const { email, senha } = req.body;
             const resultado = await this.usuarioService.login(email, senha);
