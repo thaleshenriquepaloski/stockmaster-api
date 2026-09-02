@@ -75,7 +75,7 @@
         "tags": [
           "Autenticação"
         ],
-        "summary": "Autentica o usuário e gera o token JWT",
+        "summary": "Autentica um usuário e retorna um token JWT",
         "description": "",
         "parameters": [
           {
@@ -94,7 +94,8 @@
                   "example": "Senha123segura$"
                 }
               }
-            }
+            },
+            "description": "Credenciais de acesso"
           }
         ],
         "responses": {
@@ -137,14 +138,22 @@
     },
     "/produtos": {
       "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Lista todos os produtos cadastrados",
         "description": "",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "List de produtos retornada com sucesso."
           }
         }
       },
       "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Cadastra um novo produto no estoque",
         "description": "",
         "parameters": [
           {
@@ -171,36 +180,62 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Produto cadastrado com sucesso."
+          },
+          "400": {
+            "description": "Erro de validação nos dados enviados."
+          },
+          "401": {
+            "description": "Token de autenticação ausente ou inválido."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/produtos/{id}": {
       "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Busca um produto específico pelo ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "description": "ID do produto a ser pesquisado",
+            "example": 1
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Produto encontrado."
+          },
+          "404": {
+            "description": "Produto não encontrado."
           }
         }
       },
       "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Atuliza os dados de um produto existente",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "description": "ID do produto a ser atualizado",
+            "example": 1
           },
           {
             "name": "body",
@@ -228,23 +263,48 @@
           "200": {
             "description": "OK"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Remove um produto do estoque",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "description": "ID do produto a ser deletado",
+            "example": 1
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "204": {
+            "description": "Produto deletado com sucesso. (Sem conteúdo no retorno)"
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          },
+          "404": {
+            "description": "Produto não encontrado."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/vendas": {

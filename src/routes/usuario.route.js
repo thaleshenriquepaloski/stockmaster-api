@@ -24,7 +24,22 @@ usuarioRouter.post('/auth/cadastro', validator(validadorCadastroUsuario), (req, 
     */    
     usuarioController.cadastrar(req, res, next);
 });
-usuarioRouter.post('/auth/login', validator(validadorLoginUsuario), usuarioController.login);
+usuarioRouter.post('/auth/login', validator(validadorLoginUsuario), (req, res, next) => {
+    /* 
+    #swagger.tags = ['Autenticação']
+    #swagger.summary = 'Autentica um usuário e retorna um token JWT'
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Credenciais de acesso',
+      required: true,
+      schema: {
+        email: "thales@email.com",
+        senha: "Senha123segura$"
+      }
+    }
+  */
+    usuarioController.login(req, res, next);
+});
 usuarioRouter.get('/usuarios', usuarioController.listar);
 usuarioRouter.delete('/usuarios/:id', usuarioController.deletar);
 
