@@ -46,7 +46,7 @@ produtoRouter.post('/produtos', authMiddleware, validator(validadorCadastroProdu
           required: true,
           schema: {
               nome: "Teclado Mecânico",
-              descricao: 'Teclado mecanico gamer bluetooth,
+              descricao: 'Teclado mecanico gamer bluetooth',
               preco: 350.00,
               qtd_estoque: 100
           }

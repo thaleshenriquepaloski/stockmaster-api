@@ -20,6 +20,11 @@ app.use(vendaRouter);
 app.use(errorMiddleware);
 
 app.get('/', (req, res) => {
+    /*
+      #swagger.tags = ['Geral']
+      #swagger.summary = 'Verifica o status e saúde da API'
+      #swagger.responses[200] = { description: 'API StockMaster rodando com sucesso!' }
+    */
     return res.status(200).json({ mensagem: "API StockMaster rodando com sucesso!" });
 });
 

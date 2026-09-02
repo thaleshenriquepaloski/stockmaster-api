@@ -21,10 +21,14 @@
   "paths": {
     "/": {
       "get": {
+        "tags": [
+          "Geral"
+        ],
+        "summary": "Verifica o status e saúde da API",
         "description": "",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "API StockMaster rodando com sucesso!"
           }
         }
       }
@@ -110,30 +114,62 @@
     },
     "/usuarios": {
       "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Lista todos os usuários do sistema",
         "description": "",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Lista de usuários retornada com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/usuarios/{id}": {
       "delete": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Remove um usuário do sistema",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "description": "ID do usuário a ser deletado",
+            "example": 1
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "204": {
+            "description": "Usuário removido com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/produtos": {
@@ -159,20 +195,25 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "nome": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Teclado Mecânico"
                 },
                 "descricao": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Teclado mecanico gamer bluetooth"
                 },
                 "preco": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 350
                 },
                 "qtd_estoque": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 100
                 }
               }
             }
