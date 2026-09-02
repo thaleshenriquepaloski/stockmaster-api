@@ -309,27 +309,46 @@
     },
     "/vendas": {
       "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Lista todas as vendas realizadas",
         "description": "",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Lista de vendas retornada com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Registra uma nova venda",
         "description": "",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "produto_id": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 1
                 },
                 "qtd_vendida": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 2
                 }
               }
             }
@@ -337,27 +356,55 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Venda registrada com sucesso."
+          },
+          "400": {
+            "description": "Erro de validação ou estoque insuficiente."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/vendas/{id}": {
       "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Busca detalhes de uma venda pelo ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "description": "ID da venda",
+            "example": 1
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Venda encontrada."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          },
+          "404": {
+            "description": "Venda não encontrada."
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   }
