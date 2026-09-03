@@ -3,6 +3,7 @@ import request from "supertest";
 import app from "../app.js";
 import prisma from "../database/prisma.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 describe('Teste de Integração - Usuário e Auth', () => {
     beforeEach(async () => {
@@ -81,20 +82,23 @@ describe('Teste de Integração - Usuário e Auth', () => {
         });
     });
 
-    describe('GET /usuarios', () => {
+    describe('GET /auth/usuarios', () => {
         it('deve retornar uma lista de usuarios cadastrados', async () => {
             await prisma.usuario.deleteMany();
             const senhaHash1 = await bcrypt.hash('user1User#', 10);
             const senhaHash2 = await bcrypt.hash('user2User#', 10);
-            await prisma.usuario.createMany({
-                data: [
-                    { nome: 'user 1', email: 'user1@email.com', senha: senhaHash1 },
-                    { nome: 'user 2', email: 'user2@email.com', senha: senhaHash2 }
-                ]
-            });
+            const usuario1 = await prisma.usuario.create({ data: { nome: 'user 1', email: 'user1@email.com', senha: senhaHash1 }});
+            await prisma.usuario.create({ data: { nome: 'user 2', email: 'user2@email.com', senha: senhaHash2 }})
+
+            const token = jwt.sign(
+                { id: usuario1.id, email: usuario1.email }, 
+                process.env.JWT_SECRET || 'chave_secreta_apenas_para_testes' , 
+                { expiresIn: '1h'}
+            );
 
             const resposta = await request(app)
                 .get('/usuarios')
+                .set('Authorization', `Bearer ${token}`)
 
             expect(resposta.status).toBe(200);
             expect(resposta.body.length).toBe(2);
