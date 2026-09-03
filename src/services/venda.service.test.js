@@ -32,7 +32,7 @@ describe('VendaService - Testes unitários', () => {
         it('deve lançar um erro 400 se caso a quantidade de venda for <= 0', async () => {
             const dto = { produto_id: 1, usuario_id: 1, qtd_vendida: 0 };
 
-            await expect(vendaService.cadastrar(dto)).rejects.toThrow(/^Deve ser inserido no mínimo uma unidade para venda$/);
+            await expect(vendaService.cadastrar(dto)).rejects.toThrow(/^Deve ser inserido no mínimo uma unidade válida para venda!$/);
 
             expect(prisma.produto.findUnique).not.toHaveBeenCalled();
             expect(prisma.usuario.findUnique).not.toHaveBeenCalled();

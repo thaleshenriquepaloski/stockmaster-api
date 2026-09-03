@@ -64,6 +64,7 @@ npm install
  - Crie ou certifique-se de ter um arquivo .env na raiz do projeto com a seguinte variável:
 ```
 DATABASE_URL="postgresql://usuario:senha@localhost:5432/stockmaster?schema=public"
+JWT_SECRET="sua_chave_secreta_aqui"
 ```
 ### 4. Suba o banco de dados via Docker:
 ```
@@ -71,20 +72,23 @@ docker compose up postgres -d
 ```
 ### 5. Execute as migrações do Prisma:
 ```
-npx prisma migrate dev --name init_postgres
+npx prisma migrate dev
 ```
 ### 6. Suba a aplicação completamente:
 ```
 docker compose up --build
 ```
-### 7. Execute os testes unitários:
+### 7. Execute todos os testes:
 ```
-npm test
+npm run test:all
 ```
 ### A aplicação estará rodando em http://localhost:3000 (ou na porta configurada).
 
  - Nota de Segurança: Endpoints protegidos exigem o envio do Token JWT no cabeçalho HTTP:
  > Authorization: Bearer <seu_token_jwt>
+
+ ## Documentação da API
+ > http://localhost:3000/docs
 
 ## Documentação dos Endpoints
 
@@ -100,7 +104,7 @@ npm test
 | Método | Endpoint | Descrição | Corpo da Requisição (JSON) | Requer Auth | Status de Sucesso |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **GET** | `/usuarios` | Lista todos os usuários | Nenhum | Não | `200 OK` |
-| **DELETE** | `/usuarios/:id` | Rota para deletar usuários durante o desenvolvimento da API | Nenhum | Não | `200 Ok` |
+| **DELETE** | `/usuarios/:id` | Rota para deletar usuários | Nenhum | Sim | `200 Ok` |
 
 ### Produtos (`/produtos`)
 
@@ -133,4 +137,4 @@ npm test
 - [x] Testes Unitários com Vitest
 - [x] Conteinerização do ambiente com Docker e PostgreSQL
 - [x] Testes de Integração com Supertest
-- [ ] Documentação interativa das rotas com Swagger UI.
+- [x] Documentação interativa das rotas com Swagger UI.

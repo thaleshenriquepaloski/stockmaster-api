@@ -1,0 +1,452 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "StockMaster API",
+    "description": "API RESTful para gerenciamento de estoque, produtos, usuários e vendas",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Insira um Token JWT no formato: Bearer <seu_token>"
+    }
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Geral"
+        ],
+        "summary": "Verifica o status e saúde da API",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "API StockMaster rodando com sucesso!"
+          }
+        }
+      }
+    },
+    "/auth/cadastro": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Cadastra um novo usuário",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "type": "string",
+                  "example": "Thales"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "thales@email.com"
+                },
+                "senha": {
+                  "type": "string",
+                  "example": "Senha123segura$"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usuário cadastrado com sucesso."
+          },
+          "400": {
+            "description": "Erro de validação nos dados enviados."
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Autentica um usuário e retorna um token JWT",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "thales@email.com"
+                },
+                "senha": {
+                  "type": "string",
+                  "example": "Senha123segura$"
+                }
+              }
+            },
+            "description": "Credenciais de acesso"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso."
+          },
+          "401": {
+            "description": "Credenciais inválidas."
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Lista todos os usuários do sistema",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Lista de usuários retornada com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/usuarios/{id}": {
+      "delete": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Remove um usuário do sistema",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID do usuário a ser deletado",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Usuário removido com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/produtos": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Lista todos os produtos cadastrados",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "List de produtos retornada com sucesso."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Cadastra um novo produto no estoque",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "type": "string",
+                  "example": "Teclado Mecânico"
+                },
+                "descricao": {
+                  "type": "string",
+                  "example": "Teclado mecanico gamer bluetooth"
+                },
+                "preco": {
+                  "type": "number",
+                  "example": 350
+                },
+                "qtd_estoque": {
+                  "type": "number",
+                  "example": 100
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Produto cadastrado com sucesso."
+          },
+          "400": {
+            "description": "Erro de validação nos dados enviados."
+          },
+          "401": {
+            "description": "Token de autenticação ausente ou inválido."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/produtos/{id}": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Busca um produto específico pelo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID do produto a ser pesquisado",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado."
+          },
+          "404": {
+            "description": "Produto não encontrado."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Atuliza os dados de um produto existente",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID do produto a ser atualizado",
+            "example": 1
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "example": "any"
+                },
+                "descricao": {
+                  "example": "any"
+                },
+                "preco": {
+                  "example": "any"
+                },
+                "qtd_estoque": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Remove um produto do estoque",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID do produto a ser deletado",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Produto deletado com sucesso. (Sem conteúdo no retorno)"
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          },
+          "404": {
+            "description": "Produto não encontrado."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/vendas": {
+      "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Lista todas as vendas realizadas",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Lista de vendas retornada com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Registra uma nova venda",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "produto_id": {
+                  "type": "number",
+                  "example": 1
+                },
+                "qtd_vendida": {
+                  "type": "number",
+                  "example": 2
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Venda registrada com sucesso."
+          },
+          "400": {
+            "description": "Erro de validação ou estoque insuficiente."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/vendas/{id}": {
+      "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Busca detalhes de uma venda pelo ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID da venda",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venda encontrada."
+          },
+          "401": {
+            "description": "Não autorizado. Token ausente ou inválido."
+          },
+          "404": {
+            "description": "Venda não encontrada."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  }
+}
