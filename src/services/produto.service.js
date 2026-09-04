@@ -1,4 +1,5 @@
 import prisma from "../database/prisma.js";
+import redisClient from "../configs/redis.js";
 
 class ProdutoService {
     
@@ -31,16 +32,40 @@ class ProdutoService {
             throw error;
         }
 
-        return await prisma.produto.create({
+        const novoProduto = await prisma.produto.create({
             data: { ...dto }
         });
+
+        await redisClient.del('produtos:todos');
+
+        return novoProduto;
     };
 
     async listar() {
-        return await prisma.produto.findMany();
+        const CACHE_KEY = 'produtos:todos';
+        
+        const produtosCache = await redisClient.get(CACHE_KEY);
+        if(produtosCache) {
+            return JSON.parse(produtosCache);
+        };
+
+        const produtos = await prisma.produto.findMany();
+        if(produtos.length > 0) {
+            await redisClient.set(CACHE_KEY, JSON.stringify(produtos), { EX: 60 });
+        }
+
+        return produtos;
     };
 
     async listarPorId(id) {
+
+        const CACHE_KEY = `produtos:${id}`;
+
+        const produtoCache = await redisClient.get(CACHE_KEY);
+        if(produtoCache) {
+            return JSON.parse(produtoCache)
+        }
+
         const produto = await prisma.produto.findUnique({
             where: { id }
         })
@@ -49,6 +74,9 @@ class ProdutoService {
             error.statusCode = 404;
             throw error;
         }
+
+        await redisClient.set(CACHE_KEY, JSON.stringify(produto), { EX: 60 });
+
         return produto;
     };
 
@@ -71,10 +99,15 @@ class ProdutoService {
             }
         }
 
-        return await prisma.produto.update({
+        const produtoAtualizado = await prisma.produto.update({
             where: { id },
             data: { ...dto }
         });
+
+        await redisClient.del('produtos:todos');
+        await redisClient.del(`produtos:${id}`);
+
+        return produtoAtualizado;
     };
 
     async deletar(id) {
@@ -87,9 +120,14 @@ class ProdutoService {
             throw error;
         }
 
+        
         await prisma.produto.delete({
             where: { id }
-        })
+        });
+
+        await redisClient.del('produtos:todos');
+        await redisClient.del(`produtos:${id}`);
+        
         return { mensagem: "Produto deletado com sucesso!" };
     };
 };
